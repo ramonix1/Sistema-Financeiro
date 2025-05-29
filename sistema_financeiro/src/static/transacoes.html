@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transações - Sistema de Gestão Financeira</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-wallet2"></i> Gestão Financeira
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="bi bi-house"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/transacoes"><i class="bi bi-arrow-left-right"></i> Transações</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contas"><i class="bi bi-receipt"></i> Contas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/relatorios"><i class="bi bi-bar-chart"></i> Relatórios</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-arrow-left-right"></i> Transações</h2>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalTransacao">
+                <i class="bi bi-plus-circle"></i> Nova Transação
+            </button>
+        </div>
+
+        <!-- Filtros -->
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0"><i class="bi bi-funnel"></i> Filtros</h5>
+            </div>
+            <div class="card-body">
+                <form id="form-filtros" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="filtro-tipo" class="form-label">Tipo</label>
+                        <select id="filtro-tipo" class="form-select">
+                            <option value="">Todos</option>
+                            <option value="entrada">Entradas</option>
+                            <option value="saída">Saídas</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filtro-categoria" class="form-label">Categoria</label>
+                        <select id="filtro-categoria" class="form-select">
+                            <option value="">Todas</option>
+                            <!-- Categorias serão carregadas via JavaScript -->
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filtro-data-inicio" class="form-label">Data Início</label>
+                        <input type="date" id="filtro-data-inicio" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filtro-data-fim" class="form-label">Data Fim</label>
+                        <input type="date" id="filtro-data-fim" class="form-control">
+                    </div>
+                    <div class="col-12 text-end">
+                        <button type="button" id="btn-limpar-filtros" class="btn btn-outline-secondary me-2">Limpar</button>
+                        <button type="submit" class="btn btn-primary">Filtrar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Lista de Transações -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0"><i class="bi bi-list-ul"></i> Lista de Transações</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Descrição</th>
+                                <th>Categoria</th>
+                                <th>Valor</th>
+                                <th>Tipo</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lista-transacoes">
+                            <tr>
+                                <td colspan="6" class="text-center">Carregando...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Paginação -->
+                <nav aria-label="Navegação de páginas">
+                    <ul class="pagination justify-content-center" id="paginacao">
+                        <!-- Paginação será gerada via JavaScript -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Nova Transação -->
+    <div class="modal fade" id="modalTransacao" tabindex="-1" aria-labelledby="modalTransacaoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTransacaoLabel">Nova Transação</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-transacao">
+                        <input type="hidden" id="transacao-id">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Tipo</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="tipo" id="tipo-entrada" value="entrada" checked>
+                                <label class="btn btn-outline-success" for="tipo-entrada">Entrada</label>
+                                
+                                <input type="radio" class="btn-check" name="tipo" id="tipo-saida" value="saída">
+                                <label class="btn btn-outline-danger" for="tipo-saida">Saída</label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="transacao-descricao" class="form-label">Descrição</label>
+                            <input type="text" class="form-control" id="transacao-descricao" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="transacao-valor" class="form-label">Valor (R$)</label>
+                            <input type="number" class="form-control" id="transacao-valor" step="0.01" min="0.01" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="transacao-data" class="form-label">Data</label>
+                            <input type="date" class="form-control" id="transacao-data" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="transacao-categoria" class="form-label">Categoria</label>
+                            <select class="form-select" id="transacao-categoria" required>
+                                <option value="">Selecione uma categoria</option>
+                                <!-- Categorias serão carregadas via JavaScript -->
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="transacao-fixa">
+                            <label class="form-check-label" for="transacao-fixa">Transação Fixa</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btn-salvar-transacao">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Confirmação de Exclusão -->
+    <div class="modal fade" id="modalConfirmacao" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Exclusão</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Tem certeza que deseja excluir esta transação?</p>
+                    <p>Esta ação não pode ser desfeita.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btn-confirmar-exclusao">Excluir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-light py-3 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">Sistema de Gestão Financeira &copy; 2025</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/transacoes.js"></script>
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios - Sistema de Gestão Financeira</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-wallet2"></i> Gestão Financeira
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="bi bi-house"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/transacoes"><i class="bi bi-arrow-left-right"></i> Transações</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contas"><i class="bi bi-receipt"></i> Contas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/relatorios"><i class="bi bi-bar-chart"></i> Relatórios</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2 class="mb-4"><i class="bi bi-bar-chart"></i> Relatórios</h2>
+
+        <!-- Seleção de Período -->
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0"><i class="bi bi-calendar-range"></i> Selecione o Período</h5>
+            </div>
+            <div class="card-body">
+                <form id="form-periodo" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="tipo-periodo" class="form-label">Tipo de Visualização</label>
+                        <select id="tipo-periodo" class="form-select">
+                            <option value="mensal">Mensal</option>
+                            <option value="diario">Diário</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Seleção Mensal -->
+                    <div id="selecao-mensal" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="mes" class="form-label">Mês</label>
+                            <select id="mes" class="form-select">
+                                <option value="1">Janeiro</option>
+                                <option value="2">Fevereiro</option>
+                                <option value="3">Março</option>
+                                <option value="4">Abril</option>
+                                <option value="5">Maio</option>
+                                <option value="6">Junho</option>
+                                <option value="7">Julho</option>
+                                <option value="8">Agosto</option>
+                                <option value="9">Setembro</option>
+                                <option value="10">Outubro</option>
+                                <option value="11">Novembro</option>
+                                <option value="12">Dezembro</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="ano" class="form-label">Ano</label>
+                            <select id="ano" class="form-select">
+                                <!-- Anos serão preenchidos via JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Seleção Diária -->
+                    <div id="selecao-diaria" class="row g-3" style="display: none;">
+                        <div class="col-md-4">
+                            <label for="data" class="form-label">Data</label>
+                            <input type="date" id="data" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Gerar Relatório</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Relatório Mensal -->
+        <div id="relatorio-mensal" class="mb-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0"><i class="bi bi-calendar-month"></i> Resumo Mensal</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="card border-success">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title text-success">Total de Entradas</h6>
+                                    <h3 id="total-entradas-mes" class="mb-0">R$ 0,00</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-danger">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title text-danger">Total de Saídas</h6>
+                                    <h3 id="total-saidas-mes" class="mb-0">R$ 0,00</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-primary">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title text-primary">Saldo do Mês</h6>
+                                    <h3 id="saldo-mes" class="mb-0">R$ 0,00</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="mb-3">Distribuição por Categoria</h5>
+                            <div class="chart-container">
+                                <canvas id="grafico-categorias-mes"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="mb-3">Evolução Diária</h5>
+                            <div class="chart-container">
+                                <canvas id="grafico-evolucao-diaria"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0"><i class="bi bi-table"></i> Detalhamento de Transações</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-tabs mb-3" id="transacoesTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="todas-tab" data-bs-toggle="tab" data-bs-target="#todas" type="button" role="tab" aria-controls="todas" aria-selected="true">
+                                Todas
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="entradas-tab" data-bs-toggle="tab" data-bs-target="#entradas" type="button" role="tab" aria-controls="entradas" aria-selected="false">
+                                Entradas
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="saidas-tab" data-bs-toggle="tab" data-bs-target="#saidas" type="button" role="tab" aria-controls="saidas" aria-selected="false">
+                                Saídas
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="transacoesTabsContent">
+                        <!-- Todas as Transações -->
+                        <div class="tab-pane fade show active" id="todas" role="tabpanel" aria-labelledby="todas-tab">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Data</th>
+                                            <th>Descrição</th>
+                                            <th>Categoria</th>
+                                            <th>Valor</th>
+                                            <th>Tipo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="lista-todas-transacoes">
+                                        <tr>
+                                            <td colspan="5" class="text-center">Selecione um período para visualizar as transações</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Entradas -->
+                        <div class="tab-pane fade" id="entradas" role="tabpanel" aria-labelledby="entradas-tab">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Data</th>
+                                            <th>Descrição</th>
+                                            <th>Categoria</th>
+                                            <th>Valor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="lista-entradas">
+                                        <tr>
+                                            <td colspan="4" class="text-center">Selecione um período para visualizar as entradas</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Saídas -->
+                        <div class="tab-pane fade" id="saidas" role="tabpanel" aria-labelledby="saidas-tab">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Data</th>
+                                            <th>Descrição</th>
+                                            <th>Categoria</th>
+                                            <th>Valor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="lista-saidas">
+                                        <tr>
+                                            <td colspan="4" class="text-center">Selecione um período para visualizar as saídas</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Relatório Diário -->
+        <div id="relatorio-diario" class="mb-4" style="display: none;">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0"><i class="bi bi-calendar-day"></i> Resumo Diário</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="card border-success">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title text-success">Entradas do Dia</h6>
+                                    <h3 id="total-entradas-dia" class="mb-0">R$ 0,00</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-danger">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title text-danger">Saídas do Dia</h6>
+                                    <h3 id="total-saidas-dia" class="mb-0">R$ 0,00</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-primary">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title text-primary">Saldo do Dia</h6>
+                                    <h3 id="saldo-dia" class="mb-0">R$ 0,00</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Hora</th>
+                                    <th>Descrição</th>
+                                    <th>Categoria</th>
+                                    <th>Valor</th>
+                                    <th>Tipo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lista-transacoes-dia">
+                                <tr>
+                                    <td colspan="5" class="text-center">Selecione uma data para visualizar as transações</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botões de Exportação -->
+        <div class="d-flex justify-content-end mb-4">
+            <button id="btn-exportar-pdf" class="btn btn-danger me-2">
+                <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+            </button>
+            <button id="btn-exportar-excel" class="btn btn-success">
+                <i class="bi bi-file-earmark-excel"></i> Exportar Excel
+            </button>
+        </div>
+    </div>
+
+    <footer class="bg-light py-3 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">Sistema de Gestão Financeira &copy; 2025</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/relatorios.js"></script>
+</body>
+</html>

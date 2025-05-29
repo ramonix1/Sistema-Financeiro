@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contas - Sistema de Gestão Financeira</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-wallet2"></i> Gestão Financeira
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="bi bi-house"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/transacoes"><i class="bi bi-arrow-left-right"></i> Transações</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/contas"><i class="bi bi-receipt"></i> Contas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/relatorios"><i class="bi bi-bar-chart"></i> Relatórios</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-receipt"></i> Contas</h2>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalConta">
+                <i class="bi bi-plus-circle"></i> Nova Conta
+            </button>
+        </div>
+
+        <!-- Filtros -->
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0"><i class="bi bi-funnel"></i> Filtros</h5>
+            </div>
+            <div class="card-body">
+                <form id="form-filtros" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="filtro-status" class="form-label">Status</label>
+                        <select id="filtro-status" class="form-select">
+                            <option value="">Todos</option>
+                            <option value="pendente">Pendente</option>
+                            <option value="paga">Paga</option>
+                            <option value="atrasada">Atrasada</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="filtro-tipo" class="form-label">Tipo</label>
+                        <select id="filtro-tipo" class="form-select">
+                            <option value="">Todos</option>
+                            <option value="true">Fixa</option>
+                            <option value="false">Variável</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="filtro-categoria" class="form-label">Categoria</label>
+                        <select id="filtro-categoria" class="form-select">
+                            <option value="">Todas</option>
+                            <!-- Categorias serão carregadas via JavaScript -->
+                        </select>
+                    </div>
+                    <div class="col-12 text-end">
+                        <button type="button" id="btn-limpar-filtros" class="btn btn-outline-secondary me-2">Limpar</button>
+                        <button type="submit" class="btn btn-primary">Filtrar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Abas de Contas -->
+        <ul class="nav nav-tabs mb-3" id="contasTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="todas-tab" data-bs-toggle="tab" data-bs-target="#todas" type="button" role="tab" aria-controls="todas" aria-selected="true">
+                    Todas as Contas
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="vencidas-tab" data-bs-toggle="tab" data-bs-target="#vencidas" type="button" role="tab" aria-controls="vencidas" aria-selected="false">
+                    Contas Vencidas <span class="badge bg-danger" id="contador-vencidas">0</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="proximas-tab" data-bs-toggle="tab" data-bs-target="#proximas" type="button" role="tab" aria-controls="proximas" aria-selected="false">
+                    Próximas Contas <span class="badge bg-warning" id="contador-proximas">0</span>
+                </button>
+            </li>
+        </ul>
+
+        <!-- Conteúdo das Abas -->
+        <div class="tab-content" id="contasTabsContent">
+            <!-- Todas as Contas -->
+            <div class="tab-pane fade show active" id="todas" role="tabpanel" aria-labelledby="todas-tab">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0"><i class="bi bi-list-ul"></i> Lista de Contas</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Vencimento</th>
+                                        <th>Nome</th>
+                                        <th>Categoria</th>
+                                        <th>Valor</th>
+                                        <th>Status</th>
+                                        <th>Tipo</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lista-contas">
+                                    <tr>
+                                        <td colspan="7" class="text-center">Carregando...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contas Vencidas -->
+            <div class="tab-pane fade" id="vencidas" role="tabpanel" aria-labelledby="vencidas-tab">
+                <div class="card">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="card-title mb-0"><i class="bi bi-exclamation-triangle"></i> Contas Vencidas</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Vencimento</th>
+                                        <th>Nome</th>
+                                        <th>Categoria</th>
+                                        <th>Valor</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lista-contas-vencidas">
+                                    <tr>
+                                        <td colspan="5" class="text-center">Carregando...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Próximas Contas -->
+            <div class="tab-pane fade" id="proximas" role="tabpanel" aria-labelledby="proximas-tab">
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="card-title mb-0"><i class="bi bi-calendar-check"></i> Próximas Contas</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Vencimento</th>
+                                        <th>Nome</th>
+                                        <th>Categoria</th>
+                                        <th>Valor</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lista-proximas-contas">
+                                    <tr>
+                                        <td colspan="5" class="text-center">Carregando...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Nova Conta -->
+    <div class="modal fade" id="modalConta" tabindex="-1" aria-labelledby="modalContaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalContaLabel">Nova Conta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-conta">
+                        <input type="hidden" id="conta-id">
+                        
+                        <div class="mb-3">
+                            <label for="conta-nome" class="form-label">Nome da Conta</label>
+                            <input type="text" class="form-control" id="conta-nome" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="conta-valor" class="form-label">Valor (R$)</label>
+                            <input type="number" class="form-control" id="conta-valor" step="0.01" min="0.01" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="conta-vencimento" class="form-label">Data de Vencimento</label>
+                            <input type="date" class="form-control" id="conta-vencimento" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="conta-categoria" class="form-label">Categoria</label>
+                            <select class="form-select" id="conta-categoria" required>
+                                <option value="">Selecione uma categoria</option>
+                                <!-- Categorias serão carregadas via JavaScript -->
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="conta-fixa">
+                            <label class="form-check-label" for="conta-fixa">Conta Fixa</label>
+                        </div>
+                        
+                        <div class="mb-3" id="div-periodicidade" style="display: none;">
+                            <label for="conta-periodicidade" class="form-label">Periodicidade</label>
+                            <select class="form-select" id="conta-periodicidade">
+                                <option value="">Selecione</option>
+                                <option value="diária">Diária</option>
+                                <option value="semanal">Semanal</option>
+                                <option value="quinzenal">Quinzenal</option>
+                                <option value="mensal">Mensal</option>
+                                <option value="bimestral">Bimestral</option>
+                                <option value="trimestral">Trimestral</option>
+                                <option value="semestral">Semestral</option>
+                                <option value="anual">Anual</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="conta-observacoes" class="form-label">Observações</label>
+                            <textarea class="form-control" id="conta-observacoes" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btn-salvar-conta">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Pagar Conta -->
+    <div class="modal fade" id="modalPagarConta" tabindex="-1" aria-labelledby="modalPagarContaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalPagarContaLabel">Pagar Conta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-pagar-conta">
+                        <input type="hidden" id="pagar-conta-id">
+                        
+                        <div class="mb-3">
+                            <label for="pagar-conta-nome" class="form-label">Conta</label>
+                            <input type="text" class="form-control" id="pagar-conta-nome" readonly>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="pagar-conta-valor" class="form-label">Valor (R$)</label>
+                            <input type="text" class="form-control" id="pagar-conta-valor" readonly>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="pagar-conta-data" class="form-label">Data do Pagamento</label>
+                            <input type="date" class="form-control" id="pagar-conta-data" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" id="btn-confirmar-pagamento">Confirmar Pagamento</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Confirmação de Exclusão -->
+    <div class="modal fade" id="modalConfirmacao" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Exclusão</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Tem certeza que deseja excluir esta conta?</p>
+                    <p>Esta ação não pode ser desfeita.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btn-confirmar-exclusao">Excluir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-light py-3 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">Sistema de Gestão Financeira &copy; 2025</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/contas.js"></script>
+</body>
+</html>
