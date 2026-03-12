@@ -5,3 +5,4 @@ python-dateutil==2.9.0
 # PyMySQL e cryptography só necessários se usar MySQL (remova para SQLite)
 # PyMySQL==1.1.1
 # cryptography==36.0.2
+gunicorn
