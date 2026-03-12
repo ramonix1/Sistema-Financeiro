@@ -12,7 +12,7 @@ app = Flask(__name__,
 app.config['SECRET_KEY'] = os.urandom(24)
 
 # Configuração do banco de dados
-app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{os.getenv('DB_USERNAME', 'root')}:{os.getenv('DB_PASSWORD', 'password')}@{os.getenv('DB_HOST', 'localhost')}:{os.getenv('DB_PORT', '3306')}/{os.getenv('DB_NAME', 'mydb')}"
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///financeiro.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Importar e inicializar o banco de dados

@@ -7,36 +7,41 @@ def init_db(app):
     """
     Inicializa o banco de dados e cria as tabelas.
     """
-    db.init_app(app)
     
+    db.init_app(app)
+
     with app.app_context():
-        db.create_all()
-        
-        # Importar aqui para evitar importação circular
+
+        # Importar modelos antes de criar as tabelas
         from src.models.categoria import Categoria
-        
-        # Adiciona categorias padrão se não existirem
-        if not Categoria.query.first():
+        from src.models.conta import Conta
+        from src.models.transacao import Transacao
+
+        # cria tabelas
+        db.create_all()
+
+        # adiciona categorias padrão
+        if Categoria.query.count() == 0:
+
             categorias_padrao = [
-                # Categorias de entrada
+
+                # Entradas
                 Categoria(nome="Salário", tipo="entrada"),
                 Categoria(nome="Freelance", tipo="entrada"),
                 Categoria(nome="Investimentos", tipo="entrada"),
                 Categoria(nome="Outros Rendimentos", tipo="entrada"),
-                
-                # Categorias de saída
-                Categoria(nome="Alimentação", tipo="saída"),
-                Categoria(nome="Moradia", tipo="saída"),
-                Categoria(nome="Transporte", tipo="saída"),
-                Categoria(nome="Saúde", tipo="saída"),
-                Categoria(nome="Educação", tipo="saída"),
-                Categoria(nome="Lazer", tipo="saída"),
-                Categoria(nome="Vestuário", tipo="saída"),
-                Categoria(nome="Contas Fixas", tipo="saída"),
-                Categoria(nome="Outros Gastos", tipo="saída")
+
+                # Saídas
+                Categoria(nome="Alimentação", tipo="saida"),
+                Categoria(nome="Moradia", tipo="saida"),
+                Categoria(nome="Transporte", tipo="saida"),
+                Categoria(nome="Saúde", tipo="saida"),
+                Categoria(nome="Educação", tipo="saida"),
+                Categoria(nome="Lazer", tipo="saida"),
+                Categoria(nome="Vestuário", tipo="saida"),
+                Categoria(nome="Contas Fixas", tipo="saida"),
+                Categoria(nome="Outros Gastos", tipo="saida")
             ]
-            
-            for categoria in categorias_padrao:
-                db.session.add(categoria)
-            
+
+            db.session.bulk_save_objects(categorias_padrao)
             db.session.commit()

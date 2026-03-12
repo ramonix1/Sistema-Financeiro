@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     document.getElementById('tipo-saida').addEventListener('change', function() {
-        carregarCategoriasPorTipo('saída');
+        carregarCategoriasPorTipo('saida');
     });
 });
 
@@ -43,7 +43,7 @@ function formatarData(dataStr) {
 
 // Carregar categorias
 function carregarCategorias() {
-    fetch('/api/categorias/')
+    fetch('/api/categorias')
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
@@ -70,7 +70,7 @@ function carregarCategorias() {
 
 // Carregar categorias por tipo
 function carregarCategoriasPorTipo(tipo) {
-    fetch(`/api/categorias/?tipo=${tipo}`)
+    fetch(`/api/categorias?tipo=${tipo}`)
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
